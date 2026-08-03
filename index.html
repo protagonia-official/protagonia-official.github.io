@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ProtagonIA — Donnez un cerveau métier à votre IA</title>
+  <meta name="description" content="Paramétrage de contexte LLM sur mesure. Profil utilisateur, ADN entreprise, fiche métier IA. Compatible ChatGPT, Claude, Gemini, Mistral." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:       #1F2A44;
+      --navy-light: #2B3A5C;
+      --navy-dim:   #3D5080;
+      --beige:      #E8DCC8;
+      --beige-light:#F4EFE5;
+      --beige-dark: #D4C5A9;
+      --gold:       #C6A75E;
+      --gold-light: #D4B96E;
+      --gold-dim:   rgba(198,167,94,0.15);
+      --white:      #FAFAF8;
+      --text:       #1F2A44;
+      --text-mid:   #4A5568;
+      --text-dim:   #7A8A9A;
+      --line:       rgba(31,42,68,0.12);
+      --display: 'Fredoka', sans-serif;
+      --sans:    'DM Sans', sans-serif;
+      --mono:    'DM Mono', monospace;
+      --ease:    cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--beige-light);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 16px;
+      line-height: 1.65;
+      overflow-x: hidden;
+    }
+
+    /* ── UTILITAIRES ── */
+    .container { max-width: 1060px; margin: 0 auto; padding: 0 2rem; }
+    .container--narrow { max-width: 760px; margin: 0 auto; padding: 0 2rem; }
+
+    /* ── BOUTONS ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      font-family: var(--sans); font-size: 0.85rem; font-weight: 600;
+      letter-spacing: 0.04em; text-decoration: none;
+      padding: 0.85rem 1.8rem; border-radius: 2px;
+      transition: all 0.2s var(--ease); cursor: pointer; border: none;
+    }
+    .btn-gold {
+      background: var(--gold); color: var(--navy);
+    }
+    .btn-gold:hover { background: var(--gold-light); transform: translateY(-1px); box-shadow: 0 4px 20px rgba(198,167,94,0.35); }
+    .btn-outline {
+      background: transparent; color: var(--navy);
+      border: 1.5px solid var(--navy);
+    }
+    .btn-outline:hover { background: var(--navy); color: var(--beige); }
+    .btn-outline-light {
+      background: transparent; color: var(--beige);
+      border: 1.5px solid rgba(232,220,200,0.4);
+    }
+    .btn-outline-light:hover { background: rgba(232,220,200,0.1); border-color: var(--beige); }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(244,239,229,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--line);
+      padding: 1.1rem 0;
+    }
+    .nav-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      max-width: 1060px; margin: 0 auto; padding: 0 2rem;
+    }
+    .nav-logo {
+      text-decoration: none; display: flex; align-items: center;
+    }
+    .nav-links {
+      display: flex; align-items: center; gap: 2rem; list-style: none;
+    }
+    .nav-links a {
+      font-size: 0.8rem; font-weight: 500; letter-spacing: 0.06em;
+      text-transform: uppercase; color: var(--text-mid);
+      text-decoration: none; transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--navy); }
+    @media(max-width:640px){ .nav-links { display: none; } }
+
+    /* ── HERO ── */
+    #hero {
+      background: var(--navy);
+      padding: 7rem 0 6rem;
+      position: relative; overflow: hidden;
+    }
+    #hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 70% 50%, rgba(198,167,94,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-eyebrow {
+      font-family: var(--mono); font-size: 0.7rem;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 1.5rem;
+      opacity: 0; animation: fadeUp 0.7s var(--ease) 0.1s forwards;
+    }
+    .hero-title {
+      font-family: var(--display);
+      font-size: clamp(2.8rem, 6vw, 5rem);
+      line-height: 1.08; font-weight: 700;
+      color: var(--beige); letter-spacing: -0.02em;
+      margin-bottom: 1.5rem;
+      opacity: 0; animation: fadeUp 0.8s var(--ease) 0.2s forwards;
+    }
+    .hero-title em { color: var(--gold); font-style: italic; }
+    .hero-sub {
+      font-size: 1.1rem; font-weight: 300; color: rgba(232,220,200,0.75);
+      max-width: 560px; line-height: 1.75; margin-bottom: 2.5rem;
+      opacity: 0; animation: fadeUp 0.8s var(--ease) 0.35s forwards;
+    }
+    .hero-ctas {
+      display: flex; flex-wrap: wrap; gap: 1rem;
+      opacity: 0; animation: fadeUp 0.8s var(--ease) 0.5s forwards;
+    }
+
+    /* VISUAL COMPARAISON */
+    .hero-visual {
+      margin-top: 5rem;
+      display: grid; grid-template-columns: 1fr auto 1fr; gap: 0;
+      align-items: center;
+      opacity: 0; animation: fadeIn 1s var(--ease) 0.8s forwards;
+    }
+    .compare-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(232,220,200,0.1);
+      padding: 1.8rem;
+    }
+    .compare-card.active {
+      background: rgba(198,167,94,0.08);
+      border-color: rgba(198,167,94,0.3);
+    }
+    .compare-label {
+      font-family: var(--mono); font-size: 0.62rem;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+    .compare-card:first-child .compare-label { color: var(--text-dim); }
+    .compare-card.active .compare-label { color: var(--gold); }
+    .compare-item {
+      display: flex; align-items: flex-start; gap: 0.6rem;
+      margin-bottom: 0.7rem; font-size: 0.85rem;
+    }
+    .compare-card:first-child .compare-item { color: rgba(232,220,200,0.4); }
+    .compare-card.active .compare-item { color: var(--beige); }
+    .compare-icon { flex-shrink: 0; margin-top: 0.1rem; font-size: 0.8rem; }
+    .compare-arrow {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; padding: 0 1.5rem;
+      color: var(--gold); font-size: 1.5rem;
+    }
+    .compare-arrow-label {
+      font-family: var(--mono); font-size: 0.55rem;
+      letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--gold); margin-top: 0.4rem; text-align: center;
+    }
+    @media(max-width:640px){
+      .hero-visual { grid-template-columns: 1fr; gap: 1px; }
+      .compare-arrow { padding: 1rem 0; flex-direction: row; gap: 0.5rem; }
+      .compare-arrow-label { margin-top: 0; }
+    }
+
+    /* ── BANDEAU LOGOS ── */
+    #reassurance {
+      background: var(--navy);
+      border-top: 1px solid rgba(198,167,94,0.15);
+      padding: 1.8rem 0;
+    }
+    .reassurance-inner {
+      display: flex; align-items: center; justify-content: center;
+      flex-wrap: wrap; gap: 2rem 3rem;
+    }
+    .reassurance-label {
+      font-family: var(--mono); font-size: 0.62rem;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: rgba(232,220,200,0.4);
+    }
+    .reassurance-logos {
+      display: flex; flex-wrap: wrap; gap: 1rem 2rem; align-items: center;
+    }
+    .reassurance-logo {
+      font-family: var(--mono); font-size: 0.72rem;
+      letter-spacing: 0.1em; color: rgba(232,220,200,0.55);
+      padding: 0.3rem 0.8rem;
+      border: 1px solid rgba(232,220,200,0.15);
+      border-radius: 2px;
+    }
+    .reassurance-metric {
+      font-family: var(--mono); font-size: 0.7rem;
+      letter-spacing: 0.08em; color: var(--gold);
+    }
+
+    /* ── SECTIONS GÉNÉRIQUES ── */
+    .section { padding: 6rem 0; }
+    .section-alt { background: var(--beige); }
+    .section-dark { background: var(--navy); }
+
+    .section-eyebrow {
+      font-family: var(--mono); font-size: 0.65rem;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 1rem;
+    }
+    .section-dark .section-eyebrow { color: var(--gold); }
+
+    .section-title {
+      font-family: var(--display);
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 700; line-height: 1.15;
+      color: var(--navy); letter-spacing: -0.01em;
+      margin-bottom: 1rem;
+    }
+    .section-dark .section-title { color: var(--beige); }
+
+    .section-lead {
+      font-size: 1rem; color: var(--text-mid);
+      max-width: 560px; line-height: 1.75;
+      margin-bottom: 3rem;
+    }
+    .section-dark .section-lead { color: rgba(232,220,200,0.65); }
+
+    /* ── PROBLÈME ── */
+    .pain-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;
+      margin-top: 3rem;
+    }
+    @media(max-width:720px){ .pain-grid { grid-template-columns: 1fr; } }
+
+    .pain-card {
+      background: var(--white); border: 1px solid var(--line);
+      padding: 2.2rem 2rem;
+    }
+    .pain-number {
+      font-family: var(--display); font-size: 3.5rem;
+      font-weight: 700; color: var(--beige-dark);
+      line-height: 1; margin-bottom: 1rem;
+    }
+    .pain-title {
+      font-weight: 600; color: var(--navy);
+      margin-bottom: 0.6rem; font-size: 0.95rem;
+    }
+    .pain-text { font-size: 0.88rem; color: var(--text-mid); line-height: 1.7; }
+
+    /* ── SOLUTION TRIPLET ── */
+    .triplet-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;
+      margin-top: 3rem;
+    }
+    @media(max-width:720px){ .triplet-grid { grid-template-columns: 1fr; } }
+
+    .triplet-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(232,220,200,0.12);
+      padding: 2.2rem 2rem;
+      position: relative; overflow: hidden;
+    }
+    .triplet-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: var(--gold);
+    }
+    .triplet-num {
+      font-family: var(--mono); font-size: 0.62rem;
+      letter-spacing: 0.2em; color: var(--gold);
+      margin-bottom: 1.2rem;
+    }
+    .triplet-title {
+      font-family: var(--display); font-size: 1.3rem;
+      font-weight: 600; font-style: italic;
+      color: var(--beige); margin-bottom: 0.4rem;
+    }
+    .triplet-subtitle {
+      font-family: var(--mono); font-size: 0.62rem;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 1rem;
+    }
+    .triplet-text { font-size: 0.85rem; color: rgba(232,220,200,0.6); line-height: 1.7; }
+    .triplet-items { margin-top: 1.2rem; display: flex; flex-direction: column; gap: 0.45rem; }
+    .triplet-item {
+      font-size: 0.8rem; color: rgba(232,220,200,0.7);
+      display: flex; align-items: flex-start; gap: 0.5rem;
+    }
+    .triplet-item::before { content: '—'; color: var(--gold); flex-shrink: 0; }
+
+    /* ── PROCESSUS ── */
+    .process-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 0; position: relative; margin-top: 3rem;
+    }
+    @media(max-width:720px){ .process-grid { grid-template-columns: 1fr; } }
+
+    .process-step {
+      padding: 2.5rem 2rem;
+      border: 1px solid var(--line);
+      position: relative; background: var(--white);
+    }
+    .process-step + .process-step { border-left: none; }
+    @media(max-width:720px){
+      .process-step + .process-step { border-left: 1px solid var(--line); border-top: none; }
+    }
+    .process-step-num {
+      font-family: var(--display); font-size: 4rem;
+      font-weight: 700; color: var(--beige-dark);
+      line-height: 1; margin-bottom: 1.2rem;
+    }
+    .process-step-title {
+      font-weight: 600; color: var(--navy);
+      font-size: 1rem; margin-bottom: 0.5rem;
+    }
+    .process-step-sub {
+      font-family: var(--mono); font-size: 0.6rem;
+      letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 0.8rem;
+    }
+    .process-step-text { font-size: 0.85rem; color: var(--text-mid); line-height: 1.7; }
+
+    /* ── FAQ ── */
+    .faq-list { display: flex; flex-direction: column; gap: 2px; margin-top: 3rem; }
+    .faq-item {
+      background: var(--white); border: 1px solid var(--line);
+      overflow: hidden;
+    }
+    .faq-question {
+      width: 100%; text-align: left; background: none; border: none;
+      padding: 1.5rem 2rem; display: flex; justify-content: space-between;
+      align-items: center; gap: 1rem; cursor: pointer;
+      font-family: var(--sans); font-size: 0.95rem; font-weight: 600;
+      color: var(--navy); transition: background 0.15s;
+    }
+    .faq-question:hover { background: var(--beige-light); }
+    .faq-icon {
+      flex-shrink: 0; width: 20px; height: 20px;
+      border: 1.5px solid var(--navy-dim); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.9rem; transition: transform 0.25s, background 0.25s;
+      color: var(--navy-dim);
+    }
+    .faq-item.open .faq-icon { transform: rotate(45deg); background: var(--gold); border-color: var(--gold); color: var(--navy); }
+    .faq-answer {
+      max-height: 0; overflow: hidden;
+      transition: max-height 0.35s var(--ease), padding 0.35s;
+      font-size: 0.88rem; color: var(--text-mid); line-height: 1.75;
+      padding: 0 2rem;
+    }
+    .faq-item.open .faq-answer { max-height: 300px; padding: 0 2rem 1.5rem; }
+
+    /* ── CALENDLY CTA ── */
+    #rdv {
+      background: var(--navy);
+      padding: 6rem 0;
+      text-align: center;
+      position: relative; overflow: hidden;
+    }
+    #rdv::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 60% 80% at 50% 100%, rgba(198,167,94,0.1) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .rdv-title {
+      font-family: var(--display);
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 700; font-style: italic;
+      color: var(--beige); margin-bottom: 1rem;
+      line-height: 1.15;
+    }
+    .rdv-sub {
+      font-size: 0.95rem; color: rgba(232,220,200,0.6);
+      margin-bottom: 3rem; max-width: 480px; margin-left: auto; margin-right: auto;
+    }
+    .calendly-placeholder {
+      background: rgba(255,255,255,0.04);
+      border: 1px dashed rgba(198,167,94,0.3);
+      border-radius: 2px; padding: 3rem 2rem;
+      max-width: 640px; margin: 0 auto 2rem;
+      color: rgba(232,220,200,0.35);
+      font-family: var(--mono); font-size: 0.7rem;
+      letter-spacing: 0.12em;
+    }
+    .calendly-placeholder strong {
+      display: block; font-size: 0.85rem;
+      color: var(--gold); margin-bottom: 0.5rem; letter-spacing: 0;
+      font-family: var(--sans);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: #141C2E;
+      padding: 2.5rem 0;
+      border-top: 1px solid rgba(198,167,94,0.1);
+    }
+    .footer-inner {
+      display: flex; justify-content: space-between;
+      align-items: center; flex-wrap: wrap; gap: 1rem;
+    }
+    .footer-logo {
+      text-decoration: none; display: flex; align-items: center;
+    }
+    .footer-links {
+      display: flex; gap: 2rem; flex-wrap: wrap;
+    }
+    .footer-links a {
+      font-family: var(--mono); font-size: 0.62rem;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: rgba(232,220,200,0.3); text-decoration: none;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--gold); }
+    .footer-copy {
+      font-family: var(--mono); font-size: 0.6rem;
+      color: rgba(232,220,200,0.2); letter-spacing: 0.08em;
+      width: 100%; margin-top: 1rem;
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    .reveal {
+      opacity: 0; transform: translateY(16px);
+      transition: opacity 0.65s var(--ease), transform 0.65s var(--ease);
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--beige-light); }
+    ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 2px; }
+  </style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav>
+  <div class="nav-inner">
+    <a class="nav-logo" href="#"><img src="logo.png" alt="ProtagonIA" style="height:40px;width:auto;"></a>
+    <ul class="nav-links">
+      <li><a href="#methode">Méthode</a></li>
+      <li><a href="#benefices">Bénéfices</a></li>
+      <li><a href="#faq">FAQ</a></li>
+      <li><a class="btn btn-gold" href="#rdv">Réserver un appel</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ══ HERO ══ -->
+<section id="hero">
+  <div class="container">
+    <div class="hero-eyebrow">Paramétrage de contexte LLM · Sur mesure</div>
+    <h1 class="hero-title">Transformez votre LLM<br>en <em>assistant métier</em><br>ultra-spécifique.</h1>
+    <p class="hero-sub">Ne perdez plus de temps à réexpliquer votre contexte à chaque prompt. Nous injectons votre profil, votre entreprise et la fiche métier de votre IA directement dans ses paramètres de mémoire.</p>
+    <div class="hero-ctas">
+      <a class="btn btn-gold" href="#rdv">Réserver mon appel de cadrage</a>
+      <a class="btn btn-outline-light" href="#methode">Voir la méthode</a>
+    </div>
+
+    <div class="hero-visual">
+      <div class="compare-card">
+        <div class="compare-label">IA Générique · Sans contexte</div>
+        <div class="compare-item"><span class="compare-icon">✕</span> Répond de manière générique</div>
+        <div class="compare-item"><span class="compare-icon">✕</span> Ignore votre secteur d'activité</div>
+        <div class="compare-item"><span class="compare-icon">✕</span> Ne connaît pas votre ton de marque</div>
+        <div class="compare-item"><span class="compare-icon">✕</span> Réinitialise à chaque session</div>
+      </div>
+      <div class="compare-arrow">
+        <span>→</span>
+        <span class="compare-arrow-label">Triplet<br>de Contexte</span>
+      </div>
+      <div class="compare-card active">
+        <div class="compare-label">IA Experte · Avec le Triplet</div>
+        <div class="compare-item"><span class="compare-icon">✓</span> Répond dans votre style exact</div>
+        <div class="compare-item"><span class="compare-icon">✓</span> Maîtrise votre vocabulaire métier</div>
+        <div class="compare-item"><span class="compare-icon">✓</span> Respecte l'ADN de votre entreprise</div>
+        <div class="compare-item"><span class="compare-icon">✓</span> Opérationnelle dès le premier message</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ BANDEAU LOGOS ══ -->
+<section id="reassurance">
+  <div class="container">
+    <div class="reassurance-inner">
+      <span class="reassurance-label">Compatible</span>
+      <div class="reassurance-logos">
+        <span class="reassurance-logo">ChatGPT</span>
+        <span class="reassurance-logo">Claude</span>
+        <span class="reassurance-logo">Gemini</span>
+        <span class="reassurance-logo">Mistral</span>
+        <span class="reassurance-logo">Copilot</span>
+      </div>
+      <span class="reassurance-metric">100% sur mesure · Résultat en 48h</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══ PROBLÈME ══ -->
+<section class="section" id="benefices">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-eyebrow">Le problème</div>
+      <h2 class="section-title">Votre IA ne vous connaît pas.<br>Encore.</h2>
+      <p class="section-lead">Chaque nouvelle session repart de zéro. Vous réexpliquez, recadrez, corrigez. L'IA répond — mais pas vraiment à vous.</p>
+    </div>
+    <div class="pain-grid">
+      <div class="pain-card reveal">
+        <div class="pain-number">01</div>
+        <div class="pain-title">La répétition permanente</div>
+        <p class="pain-text">Réexpliquer à chaque nouvelle session son secteur, son ton et ses contraintes. Un temps perdu qui s'accumule et épuise.</p>
+      </div>
+      <div class="pain-card reveal">
+        <div class="pain-number">02</div>
+        <div class="pain-title">Les réponses trop génériques</div>
+        <p class="pain-text">Du contenu lissé, sans valeur ajoutée métier. L'IA parle à tout le monde — donc à personne en particulier.</p>
+      </div>
+      <div class="pain-card reveal">
+        <div class="pain-number">03</div>
+        <div class="pain-title">L'alignement manqué</div>
+        <p class="pain-text">Une IA qui ne comprend ni l'ADN de votre entreprise ni votre rôle exact. Elle aide — mais à côté de ce dont vous avez besoin.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SOLUTION ══ -->
+<section class="section section-dark" id="methode">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-eyebrow">La solution</div>
+      <h2 class="section-title">Le Triplet de Contexte</h2>
+      <p class="section-lead">Trois fiches de paramétrage que nous construisons ensemble, injectées directement dans la mémoire de votre LLM.</p>
+    </div>
+    <div class="triplet-grid">
+      <div class="triplet-card reveal">
+        <div class="triplet-num">FICHE 01</div>
+        <div class="triplet-title">L'Utilisateur</div>
+        <div class="triplet-subtitle">Profil & Style</div>
+        <p class="triplet-text">Votre structure de pensée, vos préférences de communication, vos biais cognitifs à exploiter ou éviter.</p>
+        <div class="triplet-items">
+          <div class="triplet-item">Mode de raisonnement & prise de décision</div>
+          <div class="triplet-item">Style de communication préféré</div>
+          <div class="triplet-item">Formats de réponse adaptés</div>
+        </div>
+      </div>
+      <div class="triplet-card reveal">
+        <div class="triplet-num">FICHE 02</div>
+        <div class="triplet-title">L'Entreprise</div>
+        <div class="triplet-subtitle">ADN & Offre</div>
+        <p class="triplet-text">Mission, valeurs, cible, ton de marque, jargon et règles de confidentialité intégrés dans chaque réponse.</p>
+        <div class="triplet-items">
+          <div class="triplet-item">Mission, valeurs & positionnement</div>
+          <div class="triplet-item">Ton de marque & vocabulaire métier</div>
+          <div class="triplet-item">Règles de confidentialité & limites</div>
+        </div>
+      </div>
+      <div class="triplet-card reveal">
+        <div class="triplet-num">FICHE 03</div>
+        <div class="triplet-title">Le Rôle de l'IA</div>
+        <div class="triplet-subtitle">Fiche Métier</div>
+        <p class="triplet-text">Périmètre strict, objectifs définis, instructions système et limites d'intervention claires.</p>
+        <div class="triplet-items">
+          <div class="triplet-item">Objectifs & périmètre d'action</div>
+          <div class="triplet-item">Instructions système structurées</div>
+          <div class="triplet-item">Limites & comportements attendus</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ PROCESSUS ══ -->
+<section class="section section-alt">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-eyebrow">Comment ça marche</div>
+      <h2 class="section-title">Trois étapes.<br>Un résultat durable.</h2>
+    </div>
+    <div class="process-grid">
+      <div class="process-step reveal">
+        <div class="process-step-num">1</div>
+        <div class="process-step-sub">30 minutes</div>
+        <div class="process-step-title">Diagnostic & Audit</div>
+        <p class="process-step-text">Analyse de vos usages actuels, de vos besoins réels et définition des trois fiches de contexte. On cartographie exactement ce que votre IA doit savoir.</p>
+      </div>
+      <div class="process-step reveal">
+        <div class="process-step-num">2</div>
+        <div class="process-step-sub">Configuration</div>
+        <div class="process-step-title">Rédaction & Intégration</div>
+        <p class="process-step-text">Rédaction du système de prompts structuré et intégration dans la mémoire ou les paramètres de votre LLM. Aucune compétence technique requise de votre côté.</p>
+      </div>
+      <div class="process-step reveal">
+        <div class="process-step-num">3</div>
+        <div class="process-step-sub">Livraison</div>
+        <div class="process-step-title">Tests & Recette</div>
+        <p class="process-step-text">Ajustements en conditions réelles jusqu'à obtenir un comportement parfait. Vous validez, on affine. Livraison sous 48h après l'appel.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FAQ ══ -->
+<section class="section" id="faq">
+  <div class="container--narrow">
+    <div class="reveal">
+      <div class="section-eyebrow">Questions fréquentes</div>
+      <h2 class="section-title">Ce que vous voulez savoir avant de réserver.</h2>
+    </div>
+    <div class="faq-list">
+      <div class="faq-item reveal">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          Est-ce compatible avec mon LLM actuel ?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">Oui. La méthode est compatible avec tous les LLMs principaux : ChatGPT (Free, Plus, Pro), Claude (tous modèles), Gemini, Mistral, Copilot. Le paramétrage s'adapte aux spécificités de chaque plateforme — mémoire persistante, system prompt, instructions personnalisées.</div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          Mes données d'entreprise restent-elles confidentielles ?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">Absolument. Les informations que vous partagez lors de l'appel de cadrage servent exclusivement à construire vos fiches de contexte. Elles ne sont ni stockées ni partagées. Un accord de confidentialité peut être signé sur demande.</div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          Combien de temps prend la configuration ?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">L'appel de cadrage dure 30 minutes. La configuration et les tests sont réalisés dans les 48h suivantes. Vous recevez vos trois fiches finalisées et un guide d'utilisation pour les intégrer vous-même en quelques clics.</div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          Faut-il s'y connaître en technique pour utiliser le résultat ?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">Non. C'est précisément l'objectif. Vous recevez un livrable clé en main avec un guide pas-à-pas adapté à votre LLM. En quelques minutes, votre IA connaît votre contexte — sans ligne de code, sans paramétrage complexe.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ CALENDLY CTA ══ -->
+<section id="rdv">
+  <div class="container">
+    <h2 class="rdv-title reveal">Prêt à donner un vrai<br>cerveau métier à votre IA ?</h2>
+    <p class="rdv-sub reveal">Un appel de 30 minutes. Une configuration sur mesure. Une IA qui vous connaît vraiment.</p>
+
+    <!-- Widget Calendly — à remplacer par le vrai embed -->
+    <div class="calendly-placeholder reveal">
+      <strong>Widget Calendly · À intégrer ici</strong>
+      Remplacez ce bloc par le code d'intégration Calendly une fois votre compte créé.<br><br>
+      Code à insérer : &lt;div class="calendly-inline-widget" data-url="https://calendly.com/contact-protagonia/30min" style="min-width:320px;height:630px;"&gt;&lt;/div&gt;
+    </div>
+
+    <div class="reveal" style="text-align:center;">
+      <a class="btn btn-gold" href="https://calendly.com/contact-protagonia/30min" target="_blank" rel="noopener">
+        Réserver mon appel de cadrage →
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FOOTER ══ -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <a class="footer-logo" href="#"><img src="logo.png" alt="ProtagonIA" style="height:40px;width:auto;"></a>
+      <nav class="footer-links">
+        <a href="mailto:contact@protagonia.fr">Contact</a>
+        <a href="#">Mentions légales</a>
+        <a href="#">Politique de confidentialité</a>
+      </nav>
+      <p class="footer-copy">© 2026 ProtagonIA — Tous droits réservés · RGPD</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Reveal on scroll
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 80);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.06 });
+  reveals.forEach(el => observer.observe(el));
+
+  // FAQ accordion
+  function toggleFaq(btn) {
+    const item = btn.closest('.faq-item');
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(el => el.classList.remove('open'));
+    if (!isOpen) item.classList.add('open');
+  }
+</script>
+</body>
+</html>

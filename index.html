@@ -7,504 +7,213 @@
   <meta name="description" content="Paramétrage de contexte LLM sur mesure. Profil utilisateur, ADN entreprise, fiche métier IA. Compatible ChatGPT, Claude, Gemini, Mistral." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
-
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Nunito:wght@400;600;700;800;900&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --navy:       #1F2A44;
-      --navy-light: #2B3A5C;
-      --navy-dim:   #3D5080;
-      --beige:      #E8DCC8;
-      --beige-light:#F4EFE5;
-      --beige-dark: #D4C5A9;
-      --gold:       #C6A75E;
-      --gold-light: #D4B96E;
-      --gold-dim:   rgba(198,167,94,0.15);
-      --white:      #FAFAF8;
-      --text:       #1F2A44;
-      --text-mid:   #4A5568;
-      --text-dim:   #7A8A9A;
-      --line:       rgba(31,42,68,0.12);
-      --display: 'Fredoka', sans-serif;
-      --sans:    'DM Sans', sans-serif;
-      --mono:    'DM Mono', monospace;
-      --ease:    cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      --navy:#1F2A44; --navy-light:#2B3A5C; --beige:#E8DCC8;
+      --beige-light:#F2EBE0; --beige-dark:#D4C5A9;
+      --gold:#C6A75E; --gold-light:#D4B96E;
+      --gold-dim:rgba(198,167,94,0.15);
+      --line-light:rgba(31,42,68,0.1); --line-dark:rgba(232,220,200,0.1);
+      --serif:'DM Serif Display',Georgia,serif;
+      --brand:'Nunito',sans-serif;
+      --sans:'DM Sans',sans-serif;
+      --mono:'DM Mono',monospace;
+      --ease:cubic-bezier(0.25,0.46,0.45,0.94);
     }
+    html { scroll-behavior:smooth; }
+    body { background:var(--navy); color:var(--beige); font-family:var(--sans); font-size:16px; line-height:1.65; overflow-x:hidden; }
+    .container { max-width:1080px; margin:0 auto; padding:0 2.5rem; }
+    .container--narrow { max-width:760px; margin:0 auto; padding:0 2.5rem; }
 
-    html { scroll-behavior: smooth; }
-    body {
-      background: var(--beige-light);
-      color: var(--text);
-      font-family: var(--sans);
-      font-size: 16px;
-      line-height: 1.65;
-      overflow-x: hidden;
-    }
+    /* BOUTONS */
+    .btn { display:inline-flex; align-items:center; gap:0.5rem; font-family:var(--sans); font-size:0.85rem; font-weight:600; letter-spacing:0.03em; text-decoration:none; padding:0.85rem 1.8rem; border-radius:3px; transition:all 0.22s var(--ease); cursor:pointer; border:none; white-space:nowrap; }
+    .btn-gold { background:var(--gold); color:var(--navy); }
+    .btn-gold:hover { background:var(--gold-light); transform:translateY(-1px); box-shadow:0 6px 24px rgba(198,167,94,0.3); }
+    .btn-outline-light { background:transparent; color:var(--beige); border:1.5px solid rgba(232,220,200,0.3); }
+    .btn-outline-light:hover { border-color:var(--beige); background:rgba(232,220,200,0.05); }
 
-    /* ── UTILITAIRES ── */
-    .container { max-width: 1060px; margin: 0 auto; padding: 0 2rem; }
-    .container--narrow { max-width: 760px; margin: 0 auto; padding: 0 2rem; }
+    /* NAV */
+    nav { position:sticky; top:0; z-index:100; background:var(--navy); border-bottom:1px solid var(--line-dark); padding:1rem 0; }
+    .nav-inner { display:flex; align-items:center; justify-content:space-between; max-width:1080px; margin:0 auto; padding:0 2.5rem; }
+    .nav-logo { display:flex; align-items:center; gap:0.75rem; text-decoration:none; }
+    
+    .nav-links { display:flex; align-items:center; gap:2rem; list-style:none; }
+    .nav-links a { font-size:0.78rem; font-weight:500; letter-spacing:0.08em; text-transform:uppercase; color:rgba(232,220,200,0.55); text-decoration:none; transition:color 0.2s; }
+    .nav-links a:hover { color:var(--beige); }
+    @media(max-width:700px){ .nav-links { display:none; } }
 
-    /* ── BOUTONS ── */
-    .btn {
-      display: inline-flex; align-items: center; gap: 0.5rem;
-      font-family: var(--sans); font-size: 0.85rem; font-weight: 600;
-      letter-spacing: 0.04em; text-decoration: none;
-      padding: 0.85rem 1.8rem; border-radius: 2px;
-      transition: all 0.2s var(--ease); cursor: pointer; border: none;
-    }
-    .btn-gold {
-      background: var(--gold); color: var(--navy);
-    }
-    .btn-gold:hover { background: var(--gold-light); transform: translateY(-1px); box-shadow: 0 4px 20px rgba(198,167,94,0.35); }
-    .btn-outline {
-      background: transparent; color: var(--navy);
-      border: 1.5px solid var(--navy);
-    }
-    .btn-outline:hover { background: var(--navy); color: var(--beige); }
-    .btn-outline-light {
-      background: transparent; color: var(--beige);
-      border: 1.5px solid rgba(232,220,200,0.4);
-    }
-    .btn-outline-light:hover { background: rgba(232,220,200,0.1); border-color: var(--beige); }
+    /* HERO */
+    #hero { padding:7rem 0 5rem; position:relative; overflow:hidden; background:var(--navy); }
+    #hero::before { content:''; position:absolute; inset:0; background-image:radial-gradient(circle,rgba(198,167,94,0.18) 1px,transparent 1px); background-size:40px 40px; pointer-events:none; mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 30%,transparent 100%); -webkit-mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 30%,transparent 100%); }
+    #hero::after { content:''; position:absolute; width:600px; height:600px; border-radius:50%; background:radial-gradient(circle,rgba(198,167,94,0.07) 0%,transparent 70%); top:-100px; right:-100px; animation:heroPulse 6s ease-in-out infinite; pointer-events:none; }
+    @keyframes heroPulse { 0%,100%{transform:scale(1);opacity:0.6} 50%{transform:scale(1.15);opacity:1} }
+    .hero-content { position:relative; z-index:1; max-width:700px; }
+    .hero-eyebrow { font-family:var(--mono); font-size:0.68rem; letter-spacing:0.22em; text-transform:uppercase; color:var(--gold); margin-bottom:1.5rem; display:flex; align-items:center; gap:0.8rem; opacity:0; animation:fadeUp 0.7s var(--ease) 0.1s forwards; }
+    .hero-eyebrow::before { content:''; width:24px; height:1px; background:var(--gold); }
+    .hero-title { font-family:var(--serif); font-size:clamp(3rem,6vw,5.5rem); line-height:1.06; font-weight:400; color:var(--beige); letter-spacing:-0.02em; margin-bottom:1.5rem; opacity:0; animation:fadeUp 0.8s var(--ease) 0.2s forwards; }
+    .hero-title em { color:var(--gold); font-style:italic; }
+    .hero-sub { font-size:1.05rem; font-weight:300; color:rgba(232,220,200,0.65); max-width:520px; line-height:1.8; margin-bottom:2.5rem; opacity:0; animation:fadeUp 0.8s var(--ease) 0.35s forwards; }
+    .hero-ctas { display:flex; flex-wrap:wrap; gap:0.8rem; opacity:0; animation:fadeUp 0.8s var(--ease) 0.5s forwards; }
 
-    /* ── NAV ── */
-    nav {
-      position: sticky; top: 0; z-index: 100;
-      background: rgba(244,239,229,0.92);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--line);
-      padding: 1.1rem 0;
-    }
-    .nav-inner {
-      display: flex; align-items: center; justify-content: space-between;
-      max-width: 1060px; margin: 0 auto; padding: 0 2rem;
-    }
-    .nav-logo {
-      text-decoration: none; display: flex; align-items: center;
-    }
-    .nav-links {
-      display: flex; align-items: center; gap: 2rem; list-style: none;
-    }
-    .nav-links a {
-      font-size: 0.8rem; font-weight: 500; letter-spacing: 0.06em;
-      text-transform: uppercase; color: var(--text-mid);
-      text-decoration: none; transition: color 0.2s;
-    }
-    .nav-links a:hover { color: var(--navy); }
-    @media(max-width:640px){ .nav-links { display: none; } }
+    /* COMPARAISON */
+    .hero-compare { display:grid; grid-template-columns:1fr auto 1fr; gap:0; margin-top:5rem; position:relative; z-index:1; opacity:0; animation:fadeUp 0.9s var(--ease) 0.7s forwards; }
+    @media(max-width:640px){ .hero-compare{grid-template-columns:1fr} .compare-sep{padding:1rem 0;flex-direction:row;gap:0.5rem} }
+    .compare-col { padding:2rem; border:1px solid var(--line-dark); }
+    .compare-col.bad { background:rgba(255,255,255,0.02); }
+    .compare-col.good { background:rgba(198,167,94,0.06); border-color:rgba(198,167,94,0.25); }
+    .compare-tag { font-family:var(--mono); font-size:0.6rem; letter-spacing:0.18em; text-transform:uppercase; margin-bottom:1.2rem; }
+    .compare-col.bad .compare-tag { color:rgba(232,220,200,0.3); }
+    .compare-col.good .compare-tag { color:var(--gold); }
+    .compare-row { display:flex; align-items:flex-start; gap:0.6rem; font-size:0.85rem; line-height:1.5; margin-bottom:0.7rem; }
+    .compare-col.bad .compare-row { color:rgba(232,220,200,0.35); }
+    .compare-col.good .compare-row { color:var(--beige); }
+    .compare-icon { flex-shrink:0; font-size:0.75rem; margin-top:0.1rem; }
+    .compare-sep { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:0 1.5rem; color:var(--gold); }
+    .compare-sep-arrow { font-size:1.3rem; margin-bottom:0.3rem; }
+    .compare-sep-label { font-family:var(--mono); font-size:0.55rem; letter-spacing:0.15em; text-transform:uppercase; color:var(--gold); text-align:center; }
 
-    /* ── HERO ── */
-    #hero {
-      background: var(--navy);
-      padding: 7rem 0 6rem;
-      position: relative; overflow: hidden;
-    }
-    #hero::before {
-      content: '';
-      position: absolute; inset: 0;
-      background: radial-gradient(ellipse 80% 60% at 70% 50%, rgba(198,167,94,0.08) 0%, transparent 70%);
-      pointer-events: none;
-    }
+    /* BANDEAU */
+    #reassurance { background:rgba(255,255,255,0.03); border-top:1px solid var(--line-dark); border-bottom:1px solid var(--line-dark); padding:1.5rem 0; }
+    .reassurance-inner { display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:1.5rem 3rem; }
+    .reassurance-label { font-family:var(--mono); font-size:0.6rem; letter-spacing:0.2em; text-transform:uppercase; color:rgba(232,220,200,0.3); }
+    .reassurance-logos { display:flex; flex-wrap:wrap; gap:0.6rem; align-items:center; }
+    .reassurance-logo { font-family:var(--mono); font-size:0.7rem; letter-spacing:0.08em; color:rgba(232,220,200,0.45); padding:0.25rem 0.7rem; border:1px solid rgba(232,220,200,0.12); border-radius:2px; }
+    .reassurance-metric { font-family:var(--mono); font-size:0.68rem; letter-spacing:0.06em; color:var(--gold); }
 
-    .hero-eyebrow {
-      font-family: var(--mono); font-size: 0.7rem;
-      letter-spacing: 0.2em; text-transform: uppercase;
-      color: var(--gold); margin-bottom: 1.5rem;
-      opacity: 0; animation: fadeUp 0.7s var(--ease) 0.1s forwards;
-    }
-    .hero-title {
-      font-family: var(--display);
-      font-size: clamp(2.8rem, 6vw, 5rem);
-      line-height: 1.08; font-weight: 700;
-      color: var(--beige); letter-spacing: -0.02em;
-      margin-bottom: 1.5rem;
-      opacity: 0; animation: fadeUp 0.8s var(--ease) 0.2s forwards;
-    }
-    .hero-title em { color: var(--gold); font-style: italic; }
-    .hero-sub {
-      font-size: 1.1rem; font-weight: 300; color: rgba(232,220,200,0.75);
-      max-width: 560px; line-height: 1.75; margin-bottom: 2.5rem;
-      opacity: 0; animation: fadeUp 0.8s var(--ease) 0.35s forwards;
-    }
-    .hero-ctas {
-      display: flex; flex-wrap: wrap; gap: 1rem;
-      opacity: 0; animation: fadeUp 0.8s var(--ease) 0.5s forwards;
-    }
+    /* SECTIONS */
+    .section { padding:6rem 0; }
+    .section-beige { background:var(--beige-light); background-image:linear-gradient(var(--beige-light),var(--beige-light)),repeating-linear-gradient(45deg,transparent,transparent 40px,rgba(31,42,68,0.015) 40px,rgba(31,42,68,0.015) 41px); }
+    .section-navy { background:var(--navy); }
+    .section-navy-alt { background:#182236; }
+    .section-eyebrow { font-family:var(--mono); font-size:0.63rem; letter-spacing:0.22em; text-transform:uppercase; color:var(--gold); margin-bottom:1rem; }
+    .section-title { font-family:var(--serif); font-size:clamp(2rem,4vw,3.2rem); font-weight:400; line-height:1.15; letter-spacing:-0.01em; margin-bottom:1rem; }
+    .section-beige .section-title { color:var(--navy); }
+    .section-navy .section-title, .section-navy-alt .section-title { color:var(--beige); }
+    .section-lead { font-size:1rem; line-height:1.8; max-width:540px; margin-bottom:3.5rem; }
+    .section-beige .section-lead { color:rgba(31,42,68,0.6); }
+    .section-navy .section-lead, .section-navy-alt .section-lead { color:rgba(232,220,200,0.55); }
 
-    /* VISUAL COMPARAISON */
-    .hero-visual {
-      margin-top: 5rem;
-      display: grid; grid-template-columns: 1fr auto 1fr; gap: 0;
-      align-items: center;
-      opacity: 0; animation: fadeIn 1s var(--ease) 0.8s forwards;
-    }
-    .compare-card {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(232,220,200,0.1);
-      padding: 1.8rem;
-    }
-    .compare-card.active {
-      background: rgba(198,167,94,0.08);
-      border-color: rgba(198,167,94,0.3);
-    }
-    .compare-label {
-      font-family: var(--mono); font-size: 0.62rem;
-      letter-spacing: 0.18em; text-transform: uppercase;
-      margin-bottom: 1rem;
-    }
-    .compare-card:first-child .compare-label { color: var(--text-dim); }
-    .compare-card.active .compare-label { color: var(--gold); }
-    .compare-item {
-      display: flex; align-items: flex-start; gap: 0.6rem;
-      margin-bottom: 0.7rem; font-size: 0.85rem;
-    }
-    .compare-card:first-child .compare-item { color: rgba(232,220,200,0.4); }
-    .compare-card.active .compare-item { color: var(--beige); }
-    .compare-icon { flex-shrink: 0; margin-top: 0.1rem; font-size: 0.8rem; }
-    .compare-arrow {
-      display: flex; flex-direction: column; align-items: center;
-      justify-content: center; padding: 0 1.5rem;
-      color: var(--gold); font-size: 1.5rem;
-    }
-    .compare-arrow-label {
-      font-family: var(--mono); font-size: 0.55rem;
-      letter-spacing: 0.15em; text-transform: uppercase;
-      color: var(--gold); margin-top: 0.4rem; text-align: center;
-    }
-    @media(max-width:640px){
-      .hero-visual { grid-template-columns: 1fr; gap: 1px; }
-      .compare-arrow { padding: 1rem 0; flex-direction: row; gap: 0.5rem; }
-      .compare-arrow-label { margin-top: 0; }
-    }
+    /* PROBLÈME */
+    .pain-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line-light); }
+    @media(max-width:720px){ .pain-grid{grid-template-columns:1fr} }
+    .pain-card { background:#FAFAF8; padding:2.5rem 2rem; }
+    .pain-num { font-family:var(--serif); font-size:4rem; color:var(--beige-dark); line-height:1; margin-bottom:1.2rem; }
+    .pain-title { font-weight:600; color:var(--navy); margin-bottom:0.6rem; }
+    .pain-text { font-size:0.88rem; color:rgba(31,42,68,0.6); line-height:1.75; }
 
-    /* ── BANDEAU LOGOS ── */
-    #reassurance {
-      background: var(--navy);
-      border-top: 1px solid rgba(198,167,94,0.15);
-      padding: 1.8rem 0;
-    }
-    .reassurance-inner {
-      display: flex; align-items: center; justify-content: center;
-      flex-wrap: wrap; gap: 2rem 3rem;
-    }
-    .reassurance-label {
-      font-family: var(--mono); font-size: 0.62rem;
-      letter-spacing: 0.18em; text-transform: uppercase;
-      color: rgba(232,220,200,0.4);
-    }
-    .reassurance-logos {
-      display: flex; flex-wrap: wrap; gap: 1rem 2rem; align-items: center;
-    }
-    .reassurance-logo {
-      font-family: var(--mono); font-size: 0.72rem;
-      letter-spacing: 0.1em; color: rgba(232,220,200,0.55);
-      padding: 0.3rem 0.8rem;
-      border: 1px solid rgba(232,220,200,0.15);
-      border-radius: 2px;
-    }
-    .reassurance-metric {
-      font-family: var(--mono); font-size: 0.7rem;
-      letter-spacing: 0.08em; color: var(--gold);
-    }
+    /* TRIPLET */
+    .triplet-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:rgba(232,220,200,0.08); }
+    @media(max-width:720px){ .triplet-grid{grid-template-columns:1fr} }
+    .triplet-card { background:#182236; padding:2.5rem 2rem; position:relative; }
+    .triplet-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--gold),transparent); }
+    .triplet-num { font-family:var(--mono); font-size:0.6rem; letter-spacing:0.2em; color:var(--gold); margin-bottom:1.5rem; }
+    .triplet-title { font-family:var(--serif); font-size:1.5rem; font-style:italic; color:var(--beige); margin-bottom:0.3rem; }
+    .triplet-sub { font-family:var(--mono); font-size:0.6rem; letter-spacing:0.15em; text-transform:uppercase; color:var(--gold); margin-bottom:1rem; }
+    .triplet-text { font-size:0.85rem; color:rgba(232,220,200,0.5); line-height:1.75; }
+    .triplet-items { margin-top:1.2rem; display:flex; flex-direction:column; gap:0.5rem; }
+    .triplet-item { font-size:0.82rem; color:rgba(232,220,200,0.65); display:flex; align-items:flex-start; gap:0.6rem; }
+    .triplet-item::before { content:'—'; color:var(--gold); flex-shrink:0; }
 
-    /* ── SECTIONS GÉNÉRIQUES ── */
-    .section { padding: 6rem 0; }
-    .section-alt { background: var(--beige); }
-    .section-dark { background: var(--navy); }
+    /* PROCESSUS */
+    .process-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line-light); }
+    @media(max-width:720px){ .process-grid{grid-template-columns:1fr} }
+    .process-step { background:#FAFAF8; padding:2.5rem 2rem; }
+    .process-num { font-family:var(--serif); font-size:4.5rem; color:var(--beige-dark); line-height:1; margin-bottom:1rem; }
+    .process-sub { font-family:var(--mono); font-size:0.6rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--gold); margin-bottom:0.6rem; }
+    .process-title { font-weight:600; color:var(--navy); margin-bottom:0.5rem; }
+    .process-text { font-size:0.85rem; color:rgba(31,42,68,0.6); line-height:1.75; }
 
-    .section-eyebrow {
-      font-family: var(--mono); font-size: 0.65rem;
-      letter-spacing: 0.2em; text-transform: uppercase;
-      color: var(--gold); margin-bottom: 1rem;
-    }
-    .section-dark .section-eyebrow { color: var(--gold); }
+    /* FAQ */
+    .faq-list { display:flex; flex-direction:column; gap:1px; background:var(--line-light); margin-top:3rem; }
+    .faq-item { background:#FAFAF8; }
+    .faq-btn { width:100%; text-align:left; background:none; border:none; padding:1.5rem 2rem; display:flex; justify-content:space-between; align-items:center; gap:1rem; cursor:pointer; font-family:var(--sans); font-size:0.95rem; font-weight:600; color:var(--navy); transition:background 0.15s; }
+    .faq-btn:hover { background:rgba(31,42,68,0.03); }
+    .faq-icon { width:22px; height:22px; border-radius:50%; border:1.5px solid rgba(31,42,68,0.25); display:flex; align-items:center; justify-content:center; font-size:1rem; color:rgba(31,42,68,0.4); transition:all 0.25s; flex-shrink:0; }
+    .faq-item.open .faq-icon { transform:rotate(45deg); background:var(--gold); border-color:var(--gold); color:var(--navy); }
+    .faq-answer { max-height:0; overflow:hidden; transition:max-height 0.35s var(--ease),padding 0.3s; font-size:0.88rem; color:rgba(31,42,68,0.65); line-height:1.8; padding:0 2rem; }
+    .faq-item.open .faq-answer { max-height:300px; padding:0 2rem 1.5rem; }
 
-    .section-title {
-      font-family: var(--display);
-      font-size: clamp(2rem, 4vw, 3rem);
-      font-weight: 700; line-height: 1.15;
-      color: var(--navy); letter-spacing: -0.01em;
-      margin-bottom: 1rem;
-    }
-    .section-dark .section-title { color: var(--beige); }
+    /* CTA FINAL */
+    #rdv { background:var(--navy); padding:6rem 0; text-align:center; position:relative; overflow:hidden; }
+    #rdv::before { content:''; position:absolute; bottom:0; left:50%; transform:translateX(-50%); width:800px; height:400px; background:radial-gradient(ellipse,rgba(198,167,94,0.08) 0%,transparent 70%); pointer-events:none; }
+    .rdv-title { font-family:var(--serif); font-size:clamp(2rem,4vw,3.5rem); font-style:italic; font-weight:400; color:var(--beige); line-height:1.15; margin-bottom:1rem; position:relative; z-index:1; }
+    .rdv-sub { font-size:0.95rem; color:rgba(232,220,200,0.5); margin-bottom:3rem; max-width:460px; margin-left:auto; margin-right:auto; position:relative; z-index:1; }
+    .calendly-wrap { max-width:660px; margin:0 auto 2.5rem; position:relative; z-index:1; border:1px solid var(--line-dark); border-radius:3px; overflow:hidden; }
 
-    .section-lead {
-      font-size: 1rem; color: var(--text-mid);
-      max-width: 560px; line-height: 1.75;
-      margin-bottom: 3rem;
-    }
-    .section-dark .section-lead { color: rgba(232,220,200,0.65); }
+    /* FOOTER */
+    footer { background:#0F1826; padding:2.5rem 0; border-top:1px solid rgba(198,167,94,0.1); }
+    .footer-inner { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1.5rem; }
+    .footer-logo { display:flex; align-items:center; gap:0.6rem; text-decoration:none; }
+    .footer-logo-circle { width:32px; height:32px; border-radius:50%; background:rgba(232,220,200,0.08); display:flex; align-items:center; justify-content:center; overflow:hidden; }
+    .footer-logo-circle img { width:22px; height:22px; object-fit:contain; filter:brightness(0) invert(1); opacity:0.4; }
+    .footer-logo-text { font-family:var(--brand); font-size:0.9rem; font-weight:800; color:rgba(232,220,200,0.3); }
+    .footer-logo-text em { color:rgba(198,167,94,0.5); font-style:normal; }
+    .footer-links { display:flex; gap:2rem; flex-wrap:wrap; }
+    .footer-links a { font-family:var(--mono); font-size:0.6rem; letter-spacing:0.12em; text-transform:uppercase; color:rgba(232,220,200,0.25); text-decoration:none; transition:color 0.2s; }
+    .footer-links a:hover { color:var(--gold); }
+    .footer-copy { width:100%; font-family:var(--mono); font-size:0.58rem; color:rgba(232,220,200,0.15); letter-spacing:0.06em; padding-top:1.5rem; border-top:1px solid rgba(232,220,200,0.05); margin-top:0.5rem; }
 
-    /* ── PROBLÈME ── */
-    .pain-grid {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;
-      margin-top: 3rem;
-    }
-    @media(max-width:720px){ .pain-grid { grid-template-columns: 1fr; } }
-
-    .pain-card {
-      background: var(--white); border: 1px solid var(--line);
-      padding: 2.2rem 2rem;
-    }
-    .pain-number {
-      font-family: var(--display); font-size: 3.5rem;
-      font-weight: 700; color: var(--beige-dark);
-      line-height: 1; margin-bottom: 1rem;
-    }
-    .pain-title {
-      font-weight: 600; color: var(--navy);
-      margin-bottom: 0.6rem; font-size: 0.95rem;
-    }
-    .pain-text { font-size: 0.88rem; color: var(--text-mid); line-height: 1.7; }
-
-    /* ── SOLUTION TRIPLET ── */
-    .triplet-grid {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;
-      margin-top: 3rem;
-    }
-    @media(max-width:720px){ .triplet-grid { grid-template-columns: 1fr; } }
-
-    .triplet-card {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(232,220,200,0.12);
-      padding: 2.2rem 2rem;
-      position: relative; overflow: hidden;
-    }
-    .triplet-card::before {
-      content: '';
-      position: absolute; top: 0; left: 0; right: 0; height: 2px;
-      background: var(--gold);
-    }
-    .triplet-num {
-      font-family: var(--mono); font-size: 0.62rem;
-      letter-spacing: 0.2em; color: var(--gold);
-      margin-bottom: 1.2rem;
-    }
-    .triplet-title {
-      font-family: var(--display); font-size: 1.3rem;
-      font-weight: 600; font-style: italic;
-      color: var(--beige); margin-bottom: 0.4rem;
-    }
-    .triplet-subtitle {
-      font-family: var(--mono); font-size: 0.62rem;
-      letter-spacing: 0.12em; text-transform: uppercase;
-      color: var(--gold); margin-bottom: 1rem;
-    }
-    .triplet-text { font-size: 0.85rem; color: rgba(232,220,200,0.6); line-height: 1.7; }
-    .triplet-items { margin-top: 1.2rem; display: flex; flex-direction: column; gap: 0.45rem; }
-    .triplet-item {
-      font-size: 0.8rem; color: rgba(232,220,200,0.7);
-      display: flex; align-items: flex-start; gap: 0.5rem;
-    }
-    .triplet-item::before { content: '—'; color: var(--gold); flex-shrink: 0; }
-
-    /* ── PROCESSUS ── */
-    .process-grid {
-      display: grid; grid-template-columns: repeat(3, 1fr);
-      gap: 0; position: relative; margin-top: 3rem;
-    }
-    @media(max-width:720px){ .process-grid { grid-template-columns: 1fr; } }
-
-    .process-step {
-      padding: 2.5rem 2rem;
-      border: 1px solid var(--line);
-      position: relative; background: var(--white);
-    }
-    .process-step + .process-step { border-left: none; }
-    @media(max-width:720px){
-      .process-step + .process-step { border-left: 1px solid var(--line); border-top: none; }
-    }
-    .process-step-num {
-      font-family: var(--display); font-size: 4rem;
-      font-weight: 700; color: var(--beige-dark);
-      line-height: 1; margin-bottom: 1.2rem;
-    }
-    .process-step-title {
-      font-weight: 600; color: var(--navy);
-      font-size: 1rem; margin-bottom: 0.5rem;
-    }
-    .process-step-sub {
-      font-family: var(--mono); font-size: 0.6rem;
-      letter-spacing: 0.15em; text-transform: uppercase;
-      color: var(--gold); margin-bottom: 0.8rem;
-    }
-    .process-step-text { font-size: 0.85rem; color: var(--text-mid); line-height: 1.7; }
-
-    /* ── FAQ ── */
-    .faq-list { display: flex; flex-direction: column; gap: 2px; margin-top: 3rem; }
-    .faq-item {
-      background: var(--white); border: 1px solid var(--line);
-      overflow: hidden;
-    }
-    .faq-question {
-      width: 100%; text-align: left; background: none; border: none;
-      padding: 1.5rem 2rem; display: flex; justify-content: space-between;
-      align-items: center; gap: 1rem; cursor: pointer;
-      font-family: var(--sans); font-size: 0.95rem; font-weight: 600;
-      color: var(--navy); transition: background 0.15s;
-    }
-    .faq-question:hover { background: var(--beige-light); }
-    .faq-icon {
-      flex-shrink: 0; width: 20px; height: 20px;
-      border: 1.5px solid var(--navy-dim); border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.9rem; transition: transform 0.25s, background 0.25s;
-      color: var(--navy-dim);
-    }
-    .faq-item.open .faq-icon { transform: rotate(45deg); background: var(--gold); border-color: var(--gold); color: var(--navy); }
-    .faq-answer {
-      max-height: 0; overflow: hidden;
-      transition: max-height 0.35s var(--ease), padding 0.35s;
-      font-size: 0.88rem; color: var(--text-mid); line-height: 1.75;
-      padding: 0 2rem;
-    }
-    .faq-item.open .faq-answer { max-height: 300px; padding: 0 2rem 1.5rem; }
-
-    /* ── CALENDLY CTA ── */
-    #rdv {
-      background: var(--navy);
-      padding: 6rem 0;
-      text-align: center;
-      position: relative; overflow: hidden;
-    }
-    #rdv::before {
-      content: '';
-      position: absolute; inset: 0;
-      background: radial-gradient(ellipse 60% 80% at 50% 100%, rgba(198,167,94,0.1) 0%, transparent 60%);
-      pointer-events: none;
-    }
-    .rdv-title {
-      font-family: var(--display);
-      font-size: clamp(2rem, 4vw, 3.2rem);
-      font-weight: 700; font-style: italic;
-      color: var(--beige); margin-bottom: 1rem;
-      line-height: 1.15;
-    }
-    .rdv-sub {
-      font-size: 0.95rem; color: rgba(232,220,200,0.6);
-      margin-bottom: 3rem; max-width: 480px; margin-left: auto; margin-right: auto;
-    }
-    .calendly-placeholder {
-      background: rgba(255,255,255,0.04);
-      border: 1px dashed rgba(198,167,94,0.3);
-      border-radius: 2px; padding: 3rem 2rem;
-      max-width: 640px; margin: 0 auto 2rem;
-      color: rgba(232,220,200,0.35);
-      font-family: var(--mono); font-size: 0.7rem;
-      letter-spacing: 0.12em;
-    }
-    .calendly-placeholder strong {
-      display: block; font-size: 0.85rem;
-      color: var(--gold); margin-bottom: 0.5rem; letter-spacing: 0;
-      font-family: var(--sans);
-    }
-
-    /* ── FOOTER ── */
-    footer {
-      background: #141C2E;
-      padding: 2.5rem 0;
-      border-top: 1px solid rgba(198,167,94,0.1);
-    }
-    .footer-inner {
-      display: flex; justify-content: space-between;
-      align-items: center; flex-wrap: wrap; gap: 1rem;
-    }
-    .footer-logo {
-      text-decoration: none; display: flex; align-items: center;
-    }
-    .footer-links {
-      display: flex; gap: 2rem; flex-wrap: wrap;
-    }
-    .footer-links a {
-      font-family: var(--mono); font-size: 0.62rem;
-      letter-spacing: 0.12em; text-transform: uppercase;
-      color: rgba(232,220,200,0.3); text-decoration: none;
-      transition: color 0.2s;
-    }
-    .footer-links a:hover { color: var(--gold); }
-    .footer-copy {
-      font-family: var(--mono); font-size: 0.6rem;
-      color: rgba(232,220,200,0.2); letter-spacing: 0.08em;
-      width: 100%; margin-top: 1rem;
-    }
-
-    /* ── ANIMATIONS ── */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(18px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to   { opacity: 1; }
-    }
-    .reveal {
-      opacity: 0; transform: translateY(16px);
-      transition: opacity 0.65s var(--ease), transform 0.65s var(--ease);
-    }
-    .reveal.visible { opacity: 1; transform: translateY(0); }
-
-    ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-track { background: var(--beige-light); }
-    ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 2px; }
+    /* ANIMATIONS */
+    @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+    .reveal { opacity:0; transform:translateY(16px); transition:opacity 0.65s var(--ease),transform 0.65s var(--ease); }
+    .reveal.visible { opacity:1; transform:translateY(0); }
+    ::-webkit-scrollbar{width:3px} ::-webkit-scrollbar-track{background:var(--navy)} ::-webkit-scrollbar-thumb{background:var(--gold);border-radius:2px}
   </style>
 </head>
 <body>
 
-<!-- ══ NAV ══ -->
 <nav>
   <div class="nav-inner">
-    <a class="nav-logo" href="#"><img src="logo.png" alt="ProtagonIA" style="height:40px;width:auto;"></a>
+    <a class="nav-logo" href="#">
+      <img src="logo-nav.png" alt="ProtagonIA" style="height:32px;width:auto;display:block;" />
+    </a>
     <ul class="nav-links">
       <li><a href="#methode">Méthode</a></li>
       <li><a href="#benefices">Bénéfices</a></li>
       <li><a href="#faq">FAQ</a></li>
       <li><a class="btn btn-gold" href="#rdv">Réserver un appel</a></li>
-      <li><a class="btn btn-outline" href="nova.html">Rencontrer Nova</a></li>
+      <li><a class="btn btn-outline-light" href="nova.html">Rencontrer Nova</a></li>
     </ul>
   </div>
 </nav>
 
-<!-- ══ HERO ══ -->
 <section id="hero">
   <div class="container">
-    <div class="hero-eyebrow">Paramétrage de contexte LLM · Sur mesure</div>
-    <h1 class="hero-title">Transformez votre LLM<br>en <em>assistant métier</em><br>ultra-spécifique.</h1>
-    <p class="hero-sub">Ne perdez plus de temps à réexpliquer votre contexte à chaque prompt. Nous injectons votre profil, votre entreprise et la fiche métier de votre IA directement dans ses paramètres de mémoire.</p>
-    <div class="hero-ctas">
-      <a class="btn btn-gold" href="#rdv">Réserver mon appel de cadrage</a>
-      <a class="btn btn-outline-light" href="#methode">Voir la méthode</a>
-      <a class="btn btn-outline-light" href="nova.html">
-        Rencontrer Nova, mon ambassadrice IA →
-      </a>
+    <div class="hero-content">
+      <div class="hero-eyebrow">Paramétrage de contexte LLM · Sur mesure</div>
+      <h1 class="hero-title">Transformez votre LLM<br>en <em>assistant métier</em><br>ultra-spécifique.</h1>
+      <p class="hero-sub">Ne perdez plus de temps à réexpliquer votre contexte à chaque prompt. Nous injectons votre profil, votre entreprise et la fiche métier de votre IA directement dans ses paramètres de mémoire.</p>
+      <div class="hero-ctas">
+        <a class="btn btn-gold" href="#rdv">Réserver mon appel de cadrage</a>
+        <a class="btn btn-outline-light" href="#methode">Voir la méthode</a>
+        <a class="btn btn-outline-light" href="nova.html">Rencontrer Nova →</a>
+      </div>
     </div>
-
-    <div class="hero-visual">
-      <div class="compare-card">
-        <div class="compare-label">IA Générique · Sans contexte</div>
-        <div class="compare-item"><span class="compare-icon">✕</span> Répond de manière générique</div>
-        <div class="compare-item"><span class="compare-icon">✕</span> Ignore votre secteur d'activité</div>
-        <div class="compare-item"><span class="compare-icon">✕</span> Ne connaît pas votre ton de marque</div>
-        <div class="compare-item"><span class="compare-icon">✕</span> Réinitialise à chaque session</div>
+    <div class="hero-compare">
+      <div class="compare-col bad">
+        <div class="compare-tag">IA Générique · Sans contexte</div>
+        <div class="compare-row"><span class="compare-icon">✕</span> Répond de manière générique</div>
+        <div class="compare-row"><span class="compare-icon">✕</span> Ignore votre secteur d'activité</div>
+        <div class="compare-row"><span class="compare-icon">✕</span> Ne connaît pas votre ton de marque</div>
+        <div class="compare-row"><span class="compare-icon">✕</span> Réinitialise à chaque session</div>
       </div>
-      <div class="compare-arrow">
-        <span>→</span>
-        <span class="compare-arrow-label">Triplet<br>de Contexte</span>
+      <div class="compare-sep">
+        <div class="compare-sep-arrow">→</div>
+        <div class="compare-sep-label">Triplet<br>de Contexte</div>
       </div>
-      <div class="compare-card active">
-        <div class="compare-label">IA Experte · Avec le Triplet</div>
-        <div class="compare-item"><span class="compare-icon">✓</span> Répond dans votre style exact</div>
-        <div class="compare-item"><span class="compare-icon">✓</span> Maîtrise votre vocabulaire métier</div>
-        <div class="compare-item"><span class="compare-icon">✓</span> Respecte l'ADN de votre entreprise</div>
-        <div class="compare-item"><span class="compare-icon">✓</span> Opérationnelle dès le premier message</div>
+      <div class="compare-col good">
+        <div class="compare-tag">IA Experte · Avec le Triplet</div>
+        <div class="compare-row"><span class="compare-icon">✓</span> Répond dans votre style exact</div>
+        <div class="compare-row"><span class="compare-icon">✓</span> Maîtrise votre vocabulaire métier</div>
+        <div class="compare-row"><span class="compare-icon">✓</span> Respecte l'ADN de votre entreprise</div>
+        <div class="compare-row"><span class="compare-icon">✓</span> Opérationnelle dès le premier message</div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ══ BANDEAU LOGOS ══ -->
 <section id="reassurance">
   <div class="container">
     <div class="reassurance-inner">
@@ -516,13 +225,12 @@
         <span class="reassurance-logo">Mistral</span>
         <span class="reassurance-logo">Copilot</span>
       </div>
-      <span class="reassurance-metric">100% sur mesure · Résultat en 48h</span>
+      <span class="reassurance-metric">100% sur mesure · Livraison 48h</span>
     </div>
   </div>
 </section>
 
-<!-- ══ PROBLÈME ══ -->
-<section class="section" id="benefices">
+<section class="section section-beige" id="benefices">
   <div class="container">
     <div class="reveal">
       <div class="section-eyebrow">Le problème</div>
@@ -531,17 +239,17 @@
     </div>
     <div class="pain-grid">
       <div class="pain-card reveal">
-        <div class="pain-number">01</div>
+        <div class="pain-num">01</div>
         <div class="pain-title">La répétition permanente</div>
         <p class="pain-text">Réexpliquer à chaque nouvelle session son secteur, son ton et ses contraintes. Un temps perdu qui s'accumule et épuise.</p>
       </div>
       <div class="pain-card reveal">
-        <div class="pain-number">02</div>
+        <div class="pain-num">02</div>
         <div class="pain-title">Les réponses trop génériques</div>
         <p class="pain-text">Du contenu lissé, sans valeur ajoutée métier. L'IA parle à tout le monde — donc à personne en particulier.</p>
       </div>
       <div class="pain-card reveal">
-        <div class="pain-number">03</div>
+        <div class="pain-num">03</div>
         <div class="pain-title">L'alignement manqué</div>
         <p class="pain-text">Une IA qui ne comprend ni l'ADN de votre entreprise ni votre rôle exact. Elle aide — mais à côté de ce dont vous avez besoin.</p>
       </div>
@@ -549,8 +257,7 @@
   </div>
 </section>
 
-<!-- ══ SOLUTION ══ -->
-<section class="section section-dark" id="methode">
+<section class="section section-navy" id="methode">
   <div class="container">
     <div class="reveal">
       <div class="section-eyebrow">La solution</div>
@@ -561,7 +268,7 @@
       <div class="triplet-card reveal">
         <div class="triplet-num">FICHE 01</div>
         <div class="triplet-title">L'Utilisateur</div>
-        <div class="triplet-subtitle">Profil & Style</div>
+        <div class="triplet-sub">Profil & Style</div>
         <p class="triplet-text">Votre structure de pensée, vos préférences de communication, vos biais cognitifs à exploiter ou éviter.</p>
         <div class="triplet-items">
           <div class="triplet-item">Mode de raisonnement & prise de décision</div>
@@ -572,7 +279,7 @@
       <div class="triplet-card reveal">
         <div class="triplet-num">FICHE 02</div>
         <div class="triplet-title">L'Entreprise</div>
-        <div class="triplet-subtitle">ADN & Offre</div>
+        <div class="triplet-sub">ADN & Offre</div>
         <p class="triplet-text">Mission, valeurs, cible, ton de marque, jargon et règles de confidentialité intégrés dans chaque réponse.</p>
         <div class="triplet-items">
           <div class="triplet-item">Mission, valeurs & positionnement</div>
@@ -583,7 +290,7 @@
       <div class="triplet-card reveal">
         <div class="triplet-num">FICHE 03</div>
         <div class="triplet-title">Le Rôle de l'IA</div>
-        <div class="triplet-subtitle">Fiche Métier</div>
+        <div class="triplet-sub">Fiche Métier</div>
         <p class="triplet-text">Périmètre strict, objectifs définis, instructions système et limites d'intervention claires.</p>
         <div class="triplet-items">
           <div class="triplet-item">Objectifs & périmètre d'action</div>
@@ -595,8 +302,7 @@
   </div>
 </section>
 
-<!-- ══ PROCESSUS ══ -->
-<section class="section section-alt">
+<section class="section section-beige">
   <div class="container">
     <div class="reveal">
       <div class="section-eyebrow">Comment ça marche</div>
@@ -604,97 +310,89 @@
     </div>
     <div class="process-grid">
       <div class="process-step reveal">
-        <div class="process-step-num">1</div>
-        <div class="process-step-sub">30 minutes</div>
-        <div class="process-step-title">Diagnostic & Audit</div>
-        <p class="process-step-text">Analyse de vos usages actuels, de vos besoins réels et définition des trois fiches de contexte. On cartographie exactement ce que votre IA doit savoir.</p>
+        <div class="process-num">1</div>
+        <div class="process-sub">30 minutes</div>
+        <div class="process-title">Diagnostic & Audit</div>
+        <p class="process-text">Analyse de vos usages actuels, de vos besoins réels et définition des trois fiches de contexte. On cartographie exactement ce que votre IA doit savoir.</p>
       </div>
       <div class="process-step reveal">
-        <div class="process-step-num">2</div>
-        <div class="process-step-sub">Configuration</div>
-        <div class="process-step-title">Rédaction & Intégration</div>
-        <p class="process-step-text">Rédaction du système de prompts structuré et intégration dans la mémoire ou les paramètres de votre LLM. Aucune compétence technique requise de votre côté.</p>
+        <div class="process-num">2</div>
+        <div class="process-sub">Configuration</div>
+        <div class="process-title">Rédaction & Intégration</div>
+        <p class="process-text">Rédaction du système de prompts structuré et intégration dans la mémoire ou les paramètres de votre LLM. Aucune compétence technique requise de votre côté.</p>
       </div>
       <div class="process-step reveal">
-        <div class="process-step-num">3</div>
-        <div class="process-step-sub">Livraison</div>
-        <div class="process-step-title">Tests & Recette</div>
-        <p class="process-step-text">Ajustements en conditions réelles jusqu'à obtenir un comportement parfait. Vous validez, on affine. Livraison sous 48h après l'appel.</p>
+        <div class="process-num">3</div>
+        <div class="process-sub">Livraison</div>
+        <div class="process-title">Tests & Recette</div>
+        <p class="process-text">Ajustements en conditions réelles jusqu'à obtenir un comportement parfait. Vous validez, on affine. Livraison sous 48h après l'appel.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ══ FAQ ══ -->
-<section class="section" id="faq">
+<section class="section section-beige" id="faq" style="padding-top:0;">
   <div class="container--narrow">
     <div class="reveal">
       <div class="section-eyebrow">Questions fréquentes</div>
-      <h2 class="section-title">Ce que vous voulez savoir avant de réserver.</h2>
+      <h2 class="section-title">Ce que vous voulez savoir<br>avant de réserver.</h2>
     </div>
     <div class="faq-list">
       <div class="faq-item reveal">
-        <button class="faq-question" onclick="toggleFaq(this)">
+        <button class="faq-btn" onclick="toggleFaq(this)">
           Est-ce compatible avec mon LLM actuel ?
           <span class="faq-icon">+</span>
         </button>
         <div class="faq-answer">Oui. La méthode est compatible avec tous les LLMs principaux : ChatGPT (Free, Plus, Pro), Claude (tous modèles), Gemini, Mistral, Copilot. Le paramétrage s'adapte aux spécificités de chaque plateforme — mémoire persistante, system prompt, instructions personnalisées.</div>
       </div>
       <div class="faq-item reveal">
-        <button class="faq-question" onclick="toggleFaq(this)">
+        <button class="faq-btn" onclick="toggleFaq(this)">
           Mes données d'entreprise restent-elles confidentielles ?
           <span class="faq-icon">+</span>
         </button>
-        <div class="faq-answer">Absolument. Les informations que vous partagez lors de l'appel de cadrage servent exclusivement à construire vos fiches de contexte. Elles ne sont ni stockées ni partagées. Un accord de confidentialité peut être signé sur demande.</div>
+        <div class="faq-answer">Absolument. Les informations partagées lors de l'appel de cadrage servent exclusivement à construire vos fiches de contexte. Elles ne sont ni stockées ni partagées. Un accord de confidentialité peut être signé sur demande.</div>
       </div>
       <div class="faq-item reveal">
-        <button class="faq-question" onclick="toggleFaq(this)">
+        <button class="faq-btn" onclick="toggleFaq(this)">
           Combien de temps prend la configuration ?
           <span class="faq-icon">+</span>
         </button>
-        <div class="faq-answer">L'appel de cadrage dure 30 minutes. La configuration et les tests sont réalisés dans les 48h suivantes. Vous recevez vos trois fiches finalisées et un guide d'utilisation pour les intégrer vous-même en quelques clics.</div>
+        <div class="faq-answer">L'appel de cadrage dure 30 minutes. La configuration et les tests sont réalisés dans les 48h suivantes. Vous recevez vos trois fiches finalisées et un guide d'utilisation pour les intégrer en quelques clics.</div>
       </div>
       <div class="faq-item reveal">
-        <button class="faq-question" onclick="toggleFaq(this)">
+        <button class="faq-btn" onclick="toggleFaq(this)">
           Faut-il s'y connaître en technique pour utiliser le résultat ?
           <span class="faq-icon">+</span>
         </button>
-        <div class="faq-answer">Non. C'est précisément l'objectif. Vous recevez un livrable clé en main avec un guide pas-à-pas adapté à votre LLM. En quelques minutes, votre IA connaît votre contexte — sans ligne de code, sans paramétrage complexe.</div>
+        <div class="faq-answer">Non. Vous recevez un livrable clé en main avec un guide pas-à-pas adapté à votre LLM. En quelques minutes, votre IA connaît votre contexte — sans ligne de code, sans paramétrage complexe.</div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ══ CALENDLY CTA ══ -->
 <section id="rdv">
   <div class="container">
     <h2 class="rdv-title reveal">Prêt à donner un vrai<br>cerveau métier à votre IA ?</h2>
-    <p class="rdv-sub reveal">Un appel de 30 minutes. Une configuration sur mesure. Une IA qui vous connaît vraiment.</p>
-
-    <!-- Widget Calendly — à remplacer par le vrai embed -->
-    <div class="calendly-placeholder reveal">
-      <strong>Widget Calendly · À intégrer ici</strong>
-      Remplacez ce bloc par le code d'intégration Calendly une fois votre compte créé.<br><br>
-      Code à insérer : &lt;div class="calendly-inline-widget" data-url="https://calendly.com/contact-protagonia/30min" style="min-width:320px;height:630px;"&gt;&lt;/div&gt;
-    </div>
-
-    <div class="reveal" style="text-align:center;">
-      <a class="btn btn-gold" href="https://calendly.com/contact-protagonia/30min" target="_blank" rel="noopener">
-        Réserver mon appel de cadrage →
-      </a>
+    <p class="rdv-sub reveal">Un appel de 30 minutes. Une configuration sur mesure.<br>Une IA qui vous connaît vraiment.</p>
+    <div class="calendly-wrap reveal">
+      <div class="calendly-inline-widget"
+           data-url="https://calendly.com/contact-protagonia/30min?hide_event_type_details=1&hide_gdpr_banner=1&background_color=1F2A44&text_color=E8DCC8&primary_color=C6A75E"
+           style="min-width:320px;height:660px;"></div>
+      <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
     </div>
   </div>
 </section>
 
-<!-- ══ FOOTER ══ -->
 <footer>
   <div class="container">
     <div class="footer-inner">
-      <a class="footer-logo" href="#"><img src="logo.png" alt="ProtagonIA" style="height:40px;width:auto;"></a>
+      <a class="footer-logo" href="#">
+        <img src="logo-nav.png" alt="ProtagonIA" style="height:22px;width:auto;display:block;filter:brightness(0) invert(1);opacity:0.3;" />
+      </a>
       <nav class="footer-links">
-        <a href="mailto:contact@protagonia.fr">Contact</a>
+        <a href="mailto:contact@protagonia.fr">contact@protagonia.fr</a>
         <a href="#">Mentions légales</a>
-        <a href="#">Politique de confidentialité</a>
+        <a href="#">Confidentialité</a>
       </nav>
       <p class="footer-copy">© 2026 ProtagonIA — Tous droits réservés · RGPD</p>
     </div>
@@ -702,19 +400,17 @@
 </footer>
 
 <script>
-  // Reveal on scroll
   const reveals = document.querySelectorAll('.reveal');
   const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry, i) => {
       if (entry.isIntersecting) {
-        setTimeout(() => entry.target.classList.add('visible'), i * 80);
+        setTimeout(() => entry.target.classList.add('visible'), i * 70);
         observer.unobserve(entry.target);
       }
     });
   }, { threshold: 0.06 });
   reveals.forEach(el => observer.observe(el));
 
-  // FAQ accordion
   function toggleFaq(btn) {
     const item = btn.closest('.faq-item');
     const isOpen = item.classList.contains('open');
